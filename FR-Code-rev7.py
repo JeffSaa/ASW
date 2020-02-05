@@ -8,7 +8,13 @@ import os
 from models import provider as provider_model
 from models import purchase_process as pp_model
 from models import quotation as quotation_model
+from argparse import ArgumentParser
 
+parser = ArgumentParser()
+parser.add_argument("--providers", dest="providers_file")
+parser.add_argument("--purchase", dest="purchase_file")
+parser.add_argument("--quotations", dest="quotations_file")
+parser.add_argument("--scoring", dest="scoring_file")
 
 def Price(pp,Quotations,Scoring):
 	dic={'ordered_list':[],'id_provider':[],'Purchase_P':[]}
@@ -313,85 +319,22 @@ Providers=[]
 Purchase_Items=[]
 Quotations=[]
 
-#"""STEP1: We enter the file names and then they get converted to numpy objects. We specify the path, it is read as pandas
-#and then converted to numpy"""
+arg = parser.parse_args()
 
-File=input("Step1/4: Hi! please specify the path for uploading the Providers file: ")
-
-while True:	
-	try:		
-		File=pd.read_csv(File,header=0)		
-		break
-	except FileNotFoundError:
-		print("")
-		File=input("File not found, please try again")
-
-File=File.to_numpy()
+File=pd.read_csv(arg.providers_file,header=0).to_numpy()
 
 for x in range(0,File.shape[0]):
 	Providers.append(provider_model.Provider(File[x][0],File[x][1],File[x][2],File[x][3],File[x][4]))
-print("")	
-print("Great! "+str(File.shape[0])+" registers of providers were created")
 
-#"""STEP 2: Specify the path and read SCORING TABLE file into pandas and then numpy. The data is stored in a numpy array"""
+Scoring=pd.read_csv(arg.scoring_file,header=0).to_numpy()
 
-print("")
-Scoring=input("Step2/4: Ok, now please specify the path for uploading the Scoring Policy file: ")
-print("")
-
-while True:
-	try:
-		Scoring = pd.read_csv(Scoring, header=0)
-		break
-	except FileNotFoundError:
-		print("")
-		Scoring = input("File not found, please try again")
-
-Scoring=Scoring.to_numpy()
-print("Great!"+str(Scoring.shape[0])+" Scoring Policies were created")
-
-#"""STEP 3: Specify the path and read PURCHASE_PROCESS file into pandas and then numpy"""
-
-print("")
-Purchase_Request=input("Step3/4: Ok, now please specify the path for uploading the Purchase Processes file: ")
-print("")
-
-while True:
-	try:
-		Purchase_Request = pd.read_csv(Purchase_Request, header=0)
-		break
-	except FileNotFoundError:
-		print("")
-		Purchase_Request = input("File not found, please try again")
-
-Purchase_Request=Purchase_Request.to_numpy()
+Purchase_Request=pd.read_csv(arg.purchase_file,header=0).to_numpy()
 for x in range(0,Purchase_Request.shape[0]):
 	Purchase_Items.append(pp_model.Purchase_Process(Purchase_Request[x][0],Purchase_Request[x][1],Purchase_Request[x][2]))
-print("Great! "+str(Purchase_Request.shape[0])+" purchase processes were created")
 
-#"""STEP 4: Specify the path and read Quotations file into pandas and then numpy"""
-
-print("")
-Quotation_file=input("Step4/4: Finally, please specify the path for uploading the Quotations file: ")
-print("")
-
-while True:
-	try:
-		Quotation_file = pd.read_csv(Quotation_file, header=0)
-		break
-	except FileNotFoundError:
-		print("")
-		Quotation_file = input("File not found, please try again")
-
-Quotation_file=Quotation_file.to_numpy()
+Quotation_file=pd.read_csv(arg.quotations_file,header=0).to_numpy()
 for x in range(0,Quotation_file.shape[0]):
 	Quotations.append(quotation_model.Quotation(Quotation_file[x][0],Quotation_file[x][1],Quotation_file[x][2],Quotation_file[x][3],Quotation_file[x][4],Quotation_file[x][5]))
-print("Great! "+str(Quotation_file.shape[0])+" quotations were uploaded to be scored")
-print("")
-
-#"""We assign to each quotation its respective score obtained from SCORING, and the pp parameter is the purchase process.
-#This is the scoring process by price, delivery_time, local_company, Quality certification and if it is a registered
-#provider."""
 
 Execute(Providers,Purchase_Items,Quotations,Scoring)
 Generate(Purchase_Items,Quotations,Providers)

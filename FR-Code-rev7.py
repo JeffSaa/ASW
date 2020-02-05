@@ -321,20 +321,20 @@ Quotations=[]
 
 arg = parser.parse_args()
 
-File=pd.read_csv(arg.providers_file,header=0).to_numpy()
+File=pd.read_csv(arg.providers_file)
 
-for x in range(0,File.shape[0]):
-	Providers.append(provider_model.Provider(File[x][0],File[x][1],File[x][2],File[x][3],File[x][4]))
+for x in File.values:
+	Providers.append(provider_model.Provider(x[0],x[1],x[2],x[3],x[4]))
 
-Scoring=pd.read_csv(arg.scoring_file,header=0).to_numpy()
+Scoring=pd.read_csv(arg.scoring_file).to_numpy()
 
-Purchase_Request=pd.read_csv(arg.purchase_file,header=0).to_numpy()
-for x in range(0,Purchase_Request.shape[0]):
-	Purchase_Items.append(pp_model.Purchase_Process(Purchase_Request[x][0],Purchase_Request[x][1],Purchase_Request[x][2]))
+Purchase_Request=pd.read_csv(arg.purchase_file)
+for x in Purchase_Request.values:
+	Purchase_Items.append(pp_model.Purchase_Process(x[0],x[1],x[2]))
 
-Quotation_file=pd.read_csv(arg.quotations_file,header=0).to_numpy()
-for x in range(0,Quotation_file.shape[0]):
-	Quotations.append(quotation_model.Quotation(Quotation_file[x][0],Quotation_file[x][1],Quotation_file[x][2],Quotation_file[x][3],Quotation_file[x][4],Quotation_file[x][5]))
+Quotation_file=pd.read_csv(arg.quotations_file)
+for x in Quotation_file.values:
+	Quotations.append(quotation_model.Quotation(x[0],x[1],x[2],x[3],x[4],x[5]))
 
 Execute(Providers,Purchase_Items,Quotations,Scoring)
 Generate(Purchase_Items,Quotations,Providers)

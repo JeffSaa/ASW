@@ -13,7 +13,7 @@ Up: 'up' count=INT?;
 Down: 'down' count=INT?;
 Reset: 'reset';
 Exit: 'exit';
-"""
+"""			# COMO TAL EN PYTHON NO SE PUEDEN CREAR CONSTANTES DE FORMA NATIVA(SIN LIBRERIA) PERO ESTA VARIABLE ES UNA CONSTANTE EN FORMA LOGICA, ES INMUTABLE
 
 def cname(o):
 	return o.__class__.__name__
@@ -26,10 +26,10 @@ class Coordinate(object):
 	def __str__(self):
 		return "{},{}".format(self.x, self.y)
 
-def command_validator(model, finish, player, stop, game, size):
+def command_validator(model, finish, player, stop, game, size): # ESTA FUNCION MODIFICA LA VARIABLE STOP... ENTONCES TIENE EFECTOS 2DARIOS, NO ES PURA
 	for command in model.commands:
 		_cname = cname(command)
-		delta = 1 if command.count == 0 else command.count
+		delta = 1 if command.count == 0 else command.count # ESTO ES OTRO CONCEPTO YA QUE DELEGA EL FLUJO O CONDICIONES A UNA FUNCION... ESTA LINEA ES UNA FUNCION
 		if _cname == 'Left' and player.x - delta >= 0 :
 			player.x = player.x - delta
 		elif _cname == 'Right' and player.x + delta <= size - 1:
@@ -65,7 +65,10 @@ mm = metamodel_from_str(grammar)
 
 board_size = 10
 
-game, finish, player = create_game(board_size)
+game, finish, player = create_game(board_size) # CREATE GAME ES UNA FUNCION PURA YA QUE NO TIENE EFECTOS 2DARIOS... LAS VARIABLES GAME,FINIS,PLAYER SON MUTABLES
+
+# OJO... EFECTOS 2DARIOS ES CUANDO UNA FUNCION MODIFICA EL ESTADO DE UNA VARIABLE QUE ES OBSERVABLE FUERA DE SU CONTEXTO... ES DECIR, CREATE_GAME MODIFICA VARIABLES
+# PERO LOCAS, NO GLOBALES QUE LAS RETORNA Y ESOS VALORES SE LE ASIGNAN A VARIABLES GLOBALES ES OTRA VAINA
 
 stop = False
 
@@ -76,4 +79,4 @@ while not stop:
 	print("Reset game: 'reset'")
 	print("Exit game: 'exit'")
 	command = input('Enter command: ')
-	finish, player, stop, game = command_validator(mm.model_from_str(command), finish, player, stop, game, board_size)
+	finish, player, stop, game = command_validator(mm.model_from_str(command), finish, player, stop, game, board_size) #COMPOSICION DE FUNCIONES, F(G(X))
